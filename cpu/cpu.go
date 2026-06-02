@@ -109,20 +109,245 @@ func (c *CPU) Step() int {
 		return 4
 
 	case 0x4e: // ld c, [HL]
-		c.SetB(c.mmu.Read(c.HL.U16()))
+		c.SetC(c.mmu.Read(c.HL.U16()))
 		return 8
 
-	case 0x4f: // ld b, a
-		c.SetB(c.A())
+	case 0x4f: // ld c, a
+		c.SetC(c.A())
 		return 4
 
+	case 0x50: // ld d, b
+		c.SetD(c.B())
+		return 4
+
+	case 0x51: // ld d, c
+		c.SetD(c.C())
+		return 4
+
+	case 0x52: // ld d, d
+		c.SetD(c.D())
+		return 4
+
+	case 0x53: // ld d, e
+		c.SetD(c.E())
+		return 4
+
+	case 0x54: // ld d, h
+		c.SetD(c.H())
+		return 4
+
+	case 0x55: // ld d, l
+		c.SetD(c.L())
+		return 4
+
+	case 0x56: // ld d, [HL]
+		c.SetD(c.mmu.Read(c.HL.U16()))
+		return 8
+
+	case 0x57: // ld d, a
+		c.SetD(c.A())
+		return 4
+
+	case 0x58: // ld e, b
+		c.SetE(c.B())
+		return 4
+
+	case 0x59: // ld e, c
+		c.SetE(c.C())
+		return 4
+
+	case 0x5a: // ld e, d
+		c.SetE(c.D())
+		return 4
+
+	case 0x5b: // ld e, e
+		c.SetE(c.E())
+		return 4
+
+	case 0x5c: // ld e, h
+		c.SetE(c.H())
+		return 4
+
+	case 0x5d: // ld e, l
+		c.SetE(c.L())
+		return 4
+
+	case 0x5e: // ld e, [HL]
+		c.SetE(c.mmu.Read(c.HL.U16()))
+		return 8
+
+	case 0x5f: // ld e, a
+		c.SetE(c.A())
+		return 4
+
+	case 0x60: // ld h, b
+		c.SetH(c.B())
+		return 4
+
+	case 0x61: // ld h, c
+		c.SetH(c.C())
+		return 4
+
+	case 0x62: // ld h, d
+		c.SetH(c.D())
+		return 4
+
+	case 0x63: // ld h, e
+		c.SetH(c.E())
+		return 4
+
+	case 0x64: // ld h, h
+		c.SetH(c.H())
+		return 4
+
+	case 0x65: // ld h, l
+		c.SetH(c.L())
+		return 4
+
+	case 0x66: // ld h, [HL]
+		c.SetH(c.mmu.Read(c.HL.U16()))
+		return 8
+
+	case 0x67: // ld h, a
+		c.SetH(c.A())
+		return 4
+
+	case 0x68: // ld l, b
+		c.SetL(c.B())
+		return 4
+
+	case 0x69: // ld l, c
+		c.SetL(c.C())
+		return 4
+
+	case 0x6a: // ld l, d
+		c.SetL(c.D())
+		return 4
+
+	case 0x6b: // ld l, e
+		c.SetL(c.E())
+		return 4
+
+	case 0x6c: // ld l, h
+		c.SetL(c.H())
+		return 4
+
+	case 0x6d: // ld l, l
+		c.SetL(c.L())
+		return 4
+
+	case 0x6e: // ld L, [HL]
+		c.SetL(c.mmu.Read(c.HL.U16()))
+		return 8
+
+	case 0x6f: // ld L, a
+		c.SetL(c.A())
+		return 4
+
+	case 0x70: // ld (hl), b
+		c.mmu.Write(c.HL.U16(), c.B())
+		return 8
+
+	case 0x71: // ld (hl), c
+		c.mmu.Write(c.HL.U16(), c.C())
+		return 8
+
+	case 0x72: // ld (hl), d
+		c.mmu.Write(c.HL.U16(), c.D())
+		return 8
+
+	case 0x73: // ld (hl), e
+		c.mmu.Write(c.HL.U16(), c.E())
+		return 8
+
+	case 0x74: // ld (hl), h
+		c.mmu.Write(c.HL.U16(), c.H())
+		return 8
+
+	case 0x75: // ld (hl), l
+		c.mmu.Write(c.HL.U16(), c.L())
+		return 8
+
+	case 0x77: // ld (hl), a
+		c.mmu.Write(c.HL.U16(), c.A())
+		return 8
+
+	case 0x78: // ld a, b
+		c.SetA(c.B())
+		return 4
+	case 0x79: // ld a, c
+		c.SetA(c.C())
+		return 4
+	case 0x7a: // ld a, d
+		c.SetA(c.D())
+		return 4
+	case 0x7b: // ld a, e
+		c.SetA(c.E())
+		return 4
+
+	case 0x7c: // ld a, h
+		c.SetA(c.H())
+		return 4
+	case 0x7d: // ld a, l
+		c.SetA(c.L())
+		return 4
+	case 0x7e: // ld a, (hl)
+		c.SetA(c.mmu.Read(c.HL.U16()))
+		return 8
+
+	case 0x7f: // ld a, a
+		c.SetA(c.A())
+		return 4
+
+	case 0x01: // ld BC, uint16
+
+		lo := c.Fetch()
+		hi := c.Fetch()
+
+		c.SetC(lo)
+		c.SetB(hi)
+		return 12
+
+	case 0x11: // ld DE, uint16
+
+		lo := c.Fetch()
+		hi := c.Fetch()
+
+		c.SetE(lo)
+		c.SetD(hi)
+		return 12
+
+	case 0x21: // ld HL, uint16
+
+		lo := c.Fetch()
+		hi := c.Fetch()
+		c.SetL(lo)
+		c.SetH(hi)
+		return 12
+	case 0x31: // ld SP, uint16
+		lo := c.Fetch()
+		hi := c.Fetch()
+
+		c.SP = uint16(hi)<<8 | uint16(lo)
+
+		return 12
+
+	case 0x06: // ld B, uint8
+		c.SetB(c.Fetch())
+		return 8
+	case 0x16: // ld D, uint8
+		c.SetD(c.Fetch())
+		return 8
+	case 0x26: // ld H, uint8
+		c.SetH(c.Fetch())
+		return 8
+	case 0x36: // ld (HL), uint8
+		c.mmu.Write(c.HL.U16(), c.Fetch())
+		return 12
 	default:
-		fmt.Sprintf("Unknow opcode %x", opcode)
-		return 1
+		panic(fmt.Sprintf("Unknown opcode 0x%02x at 0x%04x", opcode, c.PC-1))
 
 	}
-
-	return 0
 }
 
 func (c *CPU) A() uint8 { return c.AF.hi }
