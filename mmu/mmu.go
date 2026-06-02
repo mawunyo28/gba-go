@@ -15,7 +15,7 @@ func (m *MMU) Read(addr uint16) uint8 {
 
 	switch {
 	case addr >= 0xe000 && addr <= 0xfdff: // echo ram
-		return m.wram[addr-0x2000]
+		return m.wram[addr-0xe000]
 
 	case addr >= 0xFEA0 && addr <= 0xFEFF: // prohibited
 		return 0xff
@@ -62,7 +62,7 @@ func (m *MMU) Write(addr uint16, val uint8) {
 	case addr >= 0xe000 && addr <= 0xfdff: // echo ram
 
 		// do nothing
-		m.wram[addr-0x2000] = val
+		m.wram[addr-0xe000] = val
 
 	case addr >= 0xFEA0 && addr <= 0xFEFF: // prohibited
 

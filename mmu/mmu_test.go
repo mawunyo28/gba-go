@@ -52,14 +52,18 @@ func TestReadFromUnstable(t *testing.T) {
 }
 
 func TestWriteToEchoReadFromWRAM(t *testing.T) {
-	var echoAddr uint16 = 0xfdff
-	var readAddr uint16 = 0xdfff
+	var echoAddr uint16 = 0xe000
+	var readAddr uint16 = 0xc000
+	val := uint8(0x02)
 	memory := NewMMU()
 
-	if memory.Read(echoAddr) != memory.Read(readAddr) {
+	memory.Write(echoAddr, val)
+
+	echoVal := memory.Read(readAddr)
+
+	if echoVal != val {
 
 		t.Errorf("echo mapping is wrong")
-
 	}
 
 }
