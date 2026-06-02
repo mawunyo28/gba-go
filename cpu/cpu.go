@@ -40,21 +40,89 @@ func (c *CPU) Fetch() byte {
 	return v
 }
 
-func (c *CPU) Step() {
+func (c *CPU) Step() int {
 	opcode := c.Fetch()
 
 	switch opcode {
 
 	case 0x00:
-		// ignore
+		return 4
 
 	case 0x76:
 		c.halted = true
+		return 4
+
+	case 0x40: // ld b, b
+		c.SetB(c.B())
+		return 4
+
+	case 0x41: // ld b, c
+		c.SetB(c.C())
+		return 4
+
+	case 0x42: // ld b, d
+		c.SetB(c.D())
+		return 4
+
+	case 0x43: // ld b, e
+		c.SetB(c.E())
+		return 4
+
+	case 0x44: // ld b, h
+		c.SetB(c.H())
+		return 4
+
+	case 0x45: // ld b, l
+		c.SetB(c.L())
+		return 4
+
+	case 0x46: // ld b, [HL]
+		c.SetB(c.mmu.Read(c.HL.U16()))
+		return 8
+
+	case 0x47: // ld b, a
+		c.SetB(c.A())
+		return 4
+
+	case 0x48: // ld c, b
+		c.SetC(c.B())
+		return 4
+
+	case 0x49: // ld c, c
+		c.SetC(c.C())
+		return 4
+
+	case 0x4a: // ld c, d
+		c.SetC(c.D())
+		return 4
+
+	case 0x4b: // ld c, e
+		c.SetC(c.E())
+		return 4
+
+	case 0x4c: // ld c, h
+		c.SetC(c.H())
+		return 4
+
+	case 0x4d: // ld c, l
+		c.SetC(c.L())
+		return 4
+
+	case 0x4e: // ld c, [HL]
+		c.SetB(c.mmu.Read(c.HL.U16()))
+		return 8
+
+	case 0x4f: // ld b, a
+		c.SetB(c.A())
+		return 4
 
 	default:
 		fmt.Sprintf("Unknow opcode %x", opcode)
+		return 1
 
 	}
+
+	return 0
 }
 
 func (c *CPU) A() uint8 { return c.AF.hi }
