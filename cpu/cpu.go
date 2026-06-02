@@ -344,6 +344,19 @@ func (c *CPU) Step() int {
 	case 0x36: // ld (HL), uint8
 		c.mmu.Write(c.HL.U16(), c.Fetch())
 		return 12
+
+	case 0x0E: // ld C, uint8
+		c.SetC(c.Fetch())
+		return 8
+	case 0x1E: // ld E, uint8
+		c.SetE(c.Fetch())
+		return 8
+	case 0x2E: // ld L, uint8
+		c.SetL(c.Fetch())
+		return 8
+	case 0x3E: // ld A, uint8
+		c.SetA(c.Fetch())
+		return 8
 	default:
 		panic(fmt.Sprintf("Unknown opcode 0x%02x at 0x%04x", opcode, c.PC-1))
 
