@@ -357,6 +357,118 @@ func (c *CPU) Step() int {
 	case 0x3E: // ld A, uint8
 		c.SetA(c.Fetch())
 		return 8
+
+	case 0x02: // ld (bc), a
+		c.mmu.Write(c.BC.U16(), c.A())
+		return 8
+
+	case 0x12: // ld (DE), a
+		c.mmu.Write(c.DE.U16(), c.A())
+		return 8
+
+	case 0x0A: // ld A, (BC)
+		c.SetA(c.mmu.Read(c.BC.U16()))
+		return 8
+
+	case 0x1A: // ld A, (DE)
+		c.SetA(c.mmu.Read(c.DE.U16()))
+		return 8
+
+	case 0xEA: // ld (uint16), A
+
+		lo := c.Fetch()
+		hi := c.Fetch()
+
+		addr := uint16(hi)<<8 | uint16(lo)
+
+		c.mmu.Write(addr, c.A())
+
+		return 16
+
+	case 0xFA: // ld A , (uint16)
+
+		lo := c.Fetch()
+		hi := c.Fetch()
+
+		addr := uint16(hi)<<8 | uint16(lo)
+
+		c.SetA(c.mmu.Read(addr))
+
+		return 16
+
+	case 0x22: // ld [HL+], A
+
+		c.mmu.Write(c.HL.U16(), c.A())
+		c.HL.SetU16(c.HL.U16() + 1)
+
+		return 8
+
+	case 0x32: // ld [HL-], A
+		c.mmu.Write(c.HL.U16(), c.A())
+
+		c.HL.SetU16(c.HL.U16() - 1)
+
+		return 8
+
+	case 0x2A: //ld A, [HL+]
+		c.SetA(c.mmu.Read(c.HL.U16()))
+		c.HL.SetU16(c.HL.U16() + 1)
+		return 8
+
+	case 0x3A: // ld A, [HL-]
+
+		c.SetA(c.mmu.Read(c.HL.U16()))
+		c.HL.SetU16(c.HL.U16() - 1)
+
+		return 8
+
+	case 0xE0: // ld (FF00+u8), A
+		c.mmu.Write(uint16(0xff00)+uint16(c.Fetch()), c.A())
+		return 12
+
+	case 0xF0: // ld A, (FF00+u8)
+		c.SetA(c.mmu.Read(uint16(0xff00) + uint16(c.Fetch())))
+		return 12
+
+	case 0xE2: // ld (FF00+C), A
+		c.mmu.Write(uint16(0xff00)+uint16(c.C()), c.A())
+		return 8
+
+	case 0xF2: // ld A, (FF00+c)
+		c.SetA(c.mmu.Read(uint16(0xff00) + uint16(c.C())))
+		return 8
+
+	case 0xF9: // ld SP, HL
+		c.SP = c.HL.U16()
+		return 8
+
+	case 0xF8: // ld HL, SP + i8
+		e := int8(c.Fetch())
+
+		offset := uint16(int16(c.SP) + int16(e))
+
+		c.HL.SetU16(offset)
+
+		spLo := c.SP & 0xFF
+		eLo := uint16(uint8(e))
+
+		c.SetHFlag((c.SP&0x0F)+(eLo&0x0F) > 0x0F)
+		c.SetCFlag(spLo+eLo > 0xFF)
+		c.SetZFlag(false)
+		c.SetNFlag(false)
+
+		return 12
+
+	case 0x08: // ld (u16), SP
+		lo := c.Fetch()
+		hi := c.Fetch()
+
+		addr := uint16(hi)<<8 | uint16(lo)
+		c.mmu.Write(addr, uint8(c.SP))
+		c.mmu.Write(addr+1, uint8(c.SP>>8))
+
+		return 20
+
 	default:
 		panic(fmt.Sprintf("Unknown opcode 0x%02x at 0x%04x", opcode, c.PC-1))
 
