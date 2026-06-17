@@ -469,10 +469,102 @@ func (c *CPU) Step() int {
 
 		return 20
 
+	case 0x80: // add A, B
+		c.add(c.B())
+		return 4
+
+	case 0x81: // add A, C
+		c.add(c.C())
+
+		return 4
+
+	case 0x82: // add A, D
+		c.add(c.D())
+		return 4
+
+	case 0x83: // add A, E
+		c.add(c.E())
+		return 4
+
+	case 0x84: // add A, H
+		c.add(c.H())
+		return 4
+
+	case 0x85: // add A, L
+		c.add(c.L())
+		return 4
+
+	case 0x86: // add A, (HL)
+		c.add(c.mmu.Read(c.HL.U16()))
+		return 8
+
+	case 0x87: // add A, A
+		c.add(c.A())
+		return 4
+
+	case 0x90: // sub A, B
+		c.sub(c.B())
+		return 4
+
+	case 0x91: // sub A, C
+		c.sub(c.C())
+
+		return 4
+
+	case 0x92: // sub A, D
+		c.sub(c.D())
+		return 4
+
+	case 0x93: // sub A, E
+		c.sub(c.E())
+		return 4
+
+	case 0x94: // sub A, H
+		c.sub(c.H())
+		return 4
+
+	case 0x95: // sub A, L
+		c.sub(c.L())
+		return 4
+
+	case 0x96: // sub A, (HL)
+		c.sub(c.mmu.Read(c.HL.U16()))
+		return 8
+
+	case 0x97: // sub A, A
+		c.sub(c.A())
+		return 4
+
 	default:
 		panic(fmt.Sprintf("Unknown opcode 0x%02x at 0x%04x", opcode, c.PC-1))
-
 	}
+}
+
+func (c *CPU) add(val uint8) {
+	val_16 := uint16(val)
+
+	result := uint16(c.A()) + val_16
+
+	c.SetNFlag(false)
+
+	c.SetHFlag((c.A()&0x0f + val&0x0f) > 0x0f)
+
+	c.SetZFlag(uint8(result) == 0)
+
+	c.SetCFlag(result > 0xff)
+
+	c.SetA(uint8(result))
+
+}
+
+func (c *CPU) sub(val uint8) {
+	var result uint16 = uint16(c.A()) - uint16(val)
+
+	c.SetNFlag(true)
+	c.SetCFlag(val > c.A())
+	c.SetHFlag(val&0x0f > c.A()&0x0f)
+	c.SetZFlag(uint8(result) == 0)
+	c.SetA(uint8(result))
 }
 
 func (c *CPU) A() uint8 { return c.AF.hi }
