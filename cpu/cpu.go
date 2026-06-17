@@ -567,6 +567,42 @@ func (c *CPU) sub(val uint8) {
 	c.SetA(uint8(result))
 }
 
+func (c *CPU) and(val uint8) {
+	result := c.A() & val
+
+	c.SetNFlag(false)
+	c.SetCFlag(false)
+	c.SetZFlag(result == 0)
+
+	c.SetHFlag(true)
+
+	c.SetA(result)
+}
+
+func (c *CPU) or(val uint8) {
+	result := c.A() | val
+
+	c.SetNFlag(false)
+	c.SetCFlag(false)
+	c.SetZFlag(result == 0)
+
+	c.SetHFlag(false)
+
+	c.SetA(result)
+}
+
+func (c *CPU) xor(val uint8) {
+	result := c.A() ^ val
+
+	c.SetNFlag(false)
+	c.SetCFlag(false)
+	c.SetZFlag(result == 0)
+
+	c.SetHFlag(false)
+
+	c.SetA(result)
+}
+
 func (c *CPU) A() uint8 { return c.AF.hi }
 func (c *CPU) F() uint8 { return c.AF.lo }
 func (c *CPU) B() uint8 { return c.BC.hi }
