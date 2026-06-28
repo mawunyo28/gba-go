@@ -535,9 +535,150 @@ func (c *CPU) Step() int {
 		c.sub(c.A())
 		return 4
 
+	case 0xA0: // and A, B
+		c.and(c.B())
+		return 4
+
+	case 0xA1: // and A, C
+		c.and(c.C())
+
+		return 4
+
+	case 0xA2: // and A, D
+		c.and(c.D())
+		return 4
+
+	case 0xA3: // and A, E
+		c.and(c.E())
+		return 4
+
+	case 0xA4: // and A, H
+		c.and(c.H())
+		return 4
+
+	case 0xA5: // and A, L
+		c.and(c.L())
+		return 4
+
+	case 0xA6: // and A, (HL)
+		c.and(c.mmu.Read(c.HL.U16()))
+		return 8
+
+	case 0xA7: // and A, A
+		c.and(c.A())
+		return 4
+
+	case 0xB0: // or A, B
+		c.or(c.B())
+		return 4
+
+	case 0xB1: // or A, C
+		c.or(c.C())
+
+		return 4
+
+	case 0xB2: // or A, D
+		c.or(c.D())
+		return 4
+
+	case 0xB3: // or A, E
+		c.or(c.E())
+		return 4
+
+	case 0xB4: // or A, H
+		c.or(c.H())
+		return 4
+
+	case 0xB5: // or A, L
+		c.or(c.L())
+		return 4
+
+	case 0xB6: // or A, (HL)
+		c.or(c.mmu.Read(c.HL.U16()))
+		return 8
+
+	case 0xB7: // or A, A
+		c.or(c.A())
+		return 4
+
+	case 0xA8: // xor A, B
+		c.xor(c.B())
+		return 4
+
+	case 0xA9: // xor A, C
+		c.xor(c.C())
+
+		return 4
+
+	case 0xAA: // xor A, D
+		c.xor(c.D())
+		return 4
+
+	case 0xAB: // xor A, E
+		c.xor(c.E())
+		return 4
+
+	case 0xAC: // xor A, H
+		c.xor(c.H())
+		return 4
+
+	case 0xAD: // xor A, L
+		c.xor(c.L())
+		return 4
+
+	case 0xAE: // xor A, (HL)
+		c.xor(c.mmu.Read(c.HL.U16()))
+		return 8
+
+	case 0xAF: // xor A, A
+		c.xor(c.A())
+		return 4
+
+	case 0xB8: // cp A, B
+		c.cp(c.B())
+		return 4
+
+	case 0xB9: // cp A, C
+		c.cp(c.C())
+
+		return 4
+
+	case 0xBA: // cp A, D
+		c.cp(c.D())
+		return 4
+
+	case 0xBB: // cp A, E
+		c.cp(c.E())
+		return 4
+
+	case 0xBC: // cp A, H
+		c.cp(c.H())
+		return 4
+
+	case 0xBD: // cp A, L
+		c.cp(c.L())
+		return 4
+
+	case 0xBE: // cp A, (HL)
+		c.cp(c.mmu.Read(c.HL.U16()))
+		return 8
+
+	case 0xBF: // cp A, A
+		c.cp(c.A())
+		return 4
+
 	default:
 		panic(fmt.Sprintf("Unknown opcode 0x%02x at 0x%04x", opcode, c.PC-1))
 	}
+}
+
+func (c *CPU) cp(val uint8) {
+	result := uint16(c.A()) - uint16(val)
+
+	c.SetNFlag(true)
+	c.SetCFlag(val > c.A())
+	c.SetHFlag(val&0x0f > c.A()&0x0f)
+	c.SetZFlag(uint8(result) == 0)
 }
 
 func (c *CPU) add(val uint8) {
@@ -553,6 +694,44 @@ func (c *CPU) add(val uint8) {
 
 	c.SetCFlag(result > 0xff)
 
+	c.SetA(uint8(result))
+
+}
+
+func (c *CPU) adc(val uint8) {
+	result := uint16(0)
+	if c.CFlag() {
+
+		result = uint16(c.A()) + uint16(val) + uint16(1)
+	} else {
+		result = uint16(c.A()) + uint16(val)
+	}
+
+	c.SetNFlag(false)
+
+	c.SetHFlag((c.A()&0x0f + val&0x0f) > 0x0f)
+
+	c.SetZFlag(uint8(result) == 0)
+
+	c.SetCFlag(result > 0xff)
+
+	c.SetA(uint8(result))
+
+}
+
+func (c *CPU) sbc(val uint8) {
+	result := uint16(0)
+
+	if c.CFlag() {
+		result = uint16(c.A()) - uint16(val) - 1
+	} else {
+		result = uint16(c.A()) - uint16(val)
+	}
+
+	c.SetNFlag(true)
+	c.SetCFlag(val > c.A())
+	c.SetHFlag(val&0x0f > c.A()&0x0f)
+	c.SetZFlag(uint8(result) == 0)
 	c.SetA(uint8(result))
 
 }
